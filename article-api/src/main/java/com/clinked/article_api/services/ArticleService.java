@@ -5,6 +5,7 @@ import com.clinked.article_api.repositories.ArticleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.util.Map;
 import java.time.LocalDate;
 import java.util.List;
@@ -23,20 +24,25 @@ public class ArticleService {
     }
 
     public Page<Article> getAllArticles(Pageable pageable) {
-        return articleRepository.findAll(pageable);
+        return (Page<Article>) articleRepository.findAll(pageable);
     }
 
-   public Map<LocalDate, Long> getArticleCountsByDate() {
-       List<Article> articles = articleRepository.findAll();
-       LocalDate startDate = LocalDate.now().minusDays(6); // Example: last 30 days
-       LocalDate endDate = LocalDate.now();
+    public Map<LocalDate, Long> getArticleCountsByDate() {
+        // Fetch all articles from the repository
+        List<Article> articles = articleRepository.findAll();
 
-       return startDate.datesUntil(endDate.plusDays(1))
-               .collect(Collectors.toMap(
-                       date -> date,
-                       date -> articles.stream()
-                               .filter(article -> article.getPublishedDate().equals(date))
-                               .count()
-               ));
-   }
+        // Define the date range: starting from 6 days ago to today
+        LocalDate startDate = LocalDate.now().minusDays(6); // Example: last 7 days
+        LocalDate endDate = LocalDate.now();
+
+        // Create a map where each date in the range is a key, and the value is the count of articles published on that date
+        return startDate.datesUntil(endDate.plusDays(1)) // Include the end date
+            .collect(Collectors.toMap(
+                date -> date, // Use the date as the key
+                date -> articles.stream() // Count articles published on the specific date
+                        .filter(article -> article.getPublishedDate().equals(date))
+                        .count()
+                )
+            );
+    }
 }

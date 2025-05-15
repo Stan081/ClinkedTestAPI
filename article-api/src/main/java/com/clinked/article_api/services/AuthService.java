@@ -13,12 +13,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Service class for handling authentication-related operations.
+ */
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Constructor for AuthService.
+     *
+     * @param userRepository        Repository for user data.
+     * @param authenticationManager Manager for authentication operations.
+     * @param passwordEncoder       Encoder for password encryption.
+     */
     public AuthService(
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
@@ -29,6 +39,13 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Registers a new user in the system.
+     *
+     * @param input Data transfer object containing user registration details.
+     * @return The created User object.
+     * @throws RuntimeException if an error occurs during user registration.
+     */
     public User signup(CreateUserDto input) {
         try {
             User user = new User();
@@ -43,6 +60,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * Authenticates a user based on their credentials.
+     *
+     * @param input Data transfer object containing login details.
+     * @return UserDetails object of the authenticated user.
+     * @throws RuntimeException if authentication fails or an error occurs.
+     */
     public UserDetails authenticate(LoginUserDto input) {
         try {
             authenticationManager.authenticate(
