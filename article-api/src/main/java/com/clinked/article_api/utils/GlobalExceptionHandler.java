@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 
-@ComponentScan
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -34,4 +33,13 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+        public ResponseEntity<ErrorResponseDto> handleIllegalArgumentException(IllegalArgumentException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Invalid argument provided",
+                    ex.getMessage()
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 }
