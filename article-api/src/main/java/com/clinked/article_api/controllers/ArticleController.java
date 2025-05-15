@@ -1,5 +1,6 @@
 package com.clinked.article_api.controllers;
 
+import com.clinked.article_api.dtos.ArticleDto;
 import com.clinked.article_api.models.Article;
 import com.clinked.article_api.services.ArticleService;
 import com.clinked.article_api.utils.ResponseUtil;
@@ -10,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/articles")
@@ -23,8 +22,20 @@ public class ArticleController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Object> createArticle(@Valid @RequestBody Article article) {
+    public ResponseEntity<Object> createArticle(@Valid @RequestBody ArticleDto articleDto) {
         try {
+            if (articleDto.getTitle() == null || articleDto.getTitle().isBlank() ||
+                    articleDto.getContent() == null || articleDto.getContent().isBlank() ||
+                    articleDto.getAuthor() == null || articleDto.getAuthor().isBlank()) {
+                throw new IllegalArgumentException("Author, Title, and Content are required");
+            }
+            if (articleDto.getTitle().length() > 100) {
+                throw new IllegalArgumentException("Title must not exceed 100 characters");
+            }
+            Article article = new Article();
+            article.setTitle(articleDto.getTitle());
+            article.setContent(articleDto.getContent());
+            article.setAuthor(articleDto.getAuthor());
             Article createdArticle = articleService.saveArticle(article);
             return ResponseUtil.success("Article published successfully", createdArticle);
         } catch (Exception e) {
