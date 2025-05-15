@@ -28,12 +28,12 @@ public class ArticleService {
     }
 
     public Map<LocalDate, Long> getArticleCountsByDate() {
-        // Fetch all articles from the repository
-        List<Article> articles = articleRepository.findAll();
-
         // Define the date range: starting from 6 days ago to today
         LocalDate startDate = LocalDate.now().minusDays(6); // Example: last 7 days
         LocalDate endDate = LocalDate.now();
+
+        // Fetch all articles from the repository
+        List<Article> articles = articleRepository.findByPublishedDateBetween(startDate, endDate);
 
         // Create a map where each date in the range is a key, and the value is the count of articles published on that date
         return startDate.datesUntil(endDate.plusDays(1)) // Include the end date
