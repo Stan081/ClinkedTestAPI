@@ -1,15 +1,16 @@
 package com.clinked.article_api.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Article {
     @Id
@@ -32,5 +33,5 @@ public class Article {
             nullable = false
     )
     @PastOrPresent
-    private LocalDate publishedDate;
+    private LocalDate publishedDate = LocalDate.now();
 }

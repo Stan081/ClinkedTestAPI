@@ -2,6 +2,10 @@ package com.clinked.article_api.controllers;
 
 import com.clinked.article_api.models.Article;
 import com.clinked.article_api.services.ArticleService;
+import com.clinked.article_api.utils.ResponseUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,32 +16,37 @@ import java.util.Map;
 @RestController
 @RequestMapping("/articles")
 public class ArticleController {
-    private final ArticleService service;
+    private final ArticleService articleService;
 
-    public ArticleController(ArticleService service) {
-        this.service = service;
+    public ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
     }
 
     @PostMapping("/")
-    public Article createArticle(@Valid @RequestBody Article article) {
-        return service.saveArticle(article);
+    public ResponseEntity<Object> createArticle(@Valid @RequestBody Article article) {
+        try {
+            Article createdArticle = articleService.saveArticle(article);
+            return ResponseUtil.success("Article published successfully", createdArticle);
+        } catch (Exception e) {
+            return ResponseUtil.error("Failed to publish article", 500, e.getMessage());
+        }
     }
 
-        @GetMapping("/")
-    public ResponseEntity<Map<String, Object>> listArticles() {
+    @GetMapping("/")
+    public ResponseEntity<Object> listArticles(@RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "10") int size) {
         try {
-            List<Article> articles = service.getAllArticles();
-            return ResponseEntity.ok(Map.of(
-                    "status", "articles returned successfully",
-                    "status-code", 200,
-                    "data", articles
-            ));
+            Pageable pageable = PageRequest.of(page - 1, size);
+            Page<Article> articles = articleService.getAllArticles(pageable);
+            return ResponseUtil.paginatedSuccess(
+                    "Articles returned successfully",
+                    articles.getContent(),
+                    articles.getNumber() + 1,
+                    articles.getTotalPages(),
+                    articles.getTotalElements()
+            );
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of(
-                    "code", 500,
-                    "message", "An error occurred while fetching articles",
-                    "error", e.getMessage()
-            ));
+            return ResponseUtil.error("An error occurred while fetching articles", 500, e.getMessage());
         }
     }
 }
