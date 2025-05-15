@@ -16,11 +16,4 @@ public class UserService {
         this.repository = repository;
     }
 
-    public void registerUser(String username, String password, boolean isAdmin) {
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        // user.setRoles(isAdmin ? Set.of("ADMIN") : Set.of("USER"));
-        repository.save(user);
-    }
 }

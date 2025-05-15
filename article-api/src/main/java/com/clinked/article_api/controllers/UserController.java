@@ -13,10 +13,4 @@ public class UserController {
         this.service = service;
     }
 
-
-    @PostMapping("/register")
-    public String registerUser(@RequestParam String username, @RequestParam String password, @RequestParam boolean isAdmin) {
-        service.registerUser(username, password, isAdmin);
-        return "User registered successfully!";
-    }
 }
