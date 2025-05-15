@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service class for handling authentication-related operations.
@@ -48,11 +49,19 @@ public class AuthService {
      */
     public User signup(CreateUserDto input) {
         try {
+            if (userRepository.existsByUsername(input.getUsername())) {
+                throw new RuntimeException("Username already exists");
+            }
             User user = new User();
             user.setFirstName(input.getFirstName());
             user.setLastName(input.getLastName());
             user.setUsername(input.getUsername());
             user.setPassword(passwordEncoder.encode(input.getPassword()));
+            if (input.isAdmin()) {
+                user.setRoles(Set.of("ADMIN"));
+            } else {
+                user.setRoles(Set.of("USER"));
+            }
 
             return userRepository.save(user);
         } catch (Exception e) {
@@ -84,4 +93,6 @@ public class AuthService {
             throw new RuntimeException("An error occurred during authentication: " + e.getMessage(), e);
         }
     }
+
+
 }
